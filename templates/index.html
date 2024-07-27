@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Number Plate Detection</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Number Plate Detection</h1>
+    <div class="video-container">
+        <img src="{{ url_for('video_feed') }}" id="video" />
+    </div>
+    <button id="capture-btn">Capture Image</button>
+    <script>
+        $(document).ready(function(){
+            $("#capture-btn").click(function(){
+                $.ajax({
+                    url: "/capture_image",
+                    method: "POST",
+                    success: function(response) {
+                        alert(response.message);
+                    },
+                    error: function() {
+                        alert("An error occurred while capturing the image.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
