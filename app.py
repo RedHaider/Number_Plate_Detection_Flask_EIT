@@ -13,7 +13,7 @@ harcascade = "models/haarcascade_russian_plate_number.xml"
 plate_cascade = cv2.CascadeClassifier(harcascade)
 
 # Initialize video capture
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(-1)  # Changed to 0 for the default camera
 
 # Frame holder for threading
 frame_holder = {
@@ -24,12 +24,18 @@ frame_holder = {
 frame_lock = threading.Lock()
 
 def capture_frames():
+    if not cap.isOpened():
+        print("Error: Camera not accessible.")
+        return
     while True:
         success, frame = cap.read()
         if success:
             with frame_lock:
                 frame_holder["frame"] = frame
+        else:
+            print("Failed to grab frame.")
         time.sleep(0.1)  # To reduce CPU usage
+
 
 def generate_frames():
     while True:
@@ -52,6 +58,10 @@ def generate_frames():
 def index():
     return render_template('index.html')
 
+@app.route('/numberplate')
+def numberplate():
+    return render_template('numberplate.html')
+
 @app.route('/video_feed')
 def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
@@ -69,7 +79,6 @@ def detect_plate(image):
         print("No plate detected")
     return image, plate_img
 
-
 @app.route('/api/capture', methods=['POST'])
 def api_capture():
     if 'image' not in request.files:
@@ -84,11 +93,11 @@ def api_capture():
 
     full_img, plate_img = detect_plate(img)
 
-    if not os.path.exists('plates'):
-        os.makedirs('plates')
+    if not os.path.exists('static/plates'):
+        os.makedirs('static/plates')
 
-    full_image_path = os.path.join('plates', 'full_image.jpg')
-    plate_image_path = os.path.join('plates', 'plate_image.jpg')
+    full_image_path = os.path.join('static/plates', 'full_image.jpg')
+    plate_image_path = os.path.join('static/plates', 'plate_image.jpg')
 
     cv2.imwrite(full_image_path, full_img)
     if plate_img is not None:

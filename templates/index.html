@@ -1,31 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Number Plate Detection</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Number Plate Detection</h1>
-    <div class="video-container">
-        <img src="{{ url_for('video_feed') }}" id="video" />
+    <div class="container">
+        <h1 class="mt-4">EIT AI Tools</h1>
+        
+        <!-- Table -->
+        <table class="table table-bordered mt-4">
+            <thead>
+                <tr>
+                    <th>Tool Name</th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Face Detection</td>
+                    <td><a href="#">Click Here</a></td>
+                </tr>
+                <tr>
+                    <td>Number Plate Detection</td>
+                    <td><a href="{{ url_for('numberplate') }}">Click Here</a></td>
+                </tr>
+                <!-- Add more rows as needed -->
+            </tbody>
+        </table>
     </div>
-    <button id="capture-btn">Capture Image</button>
-    <script>
-        $(document).ready(function(){
-            $("#capture-btn").click(function(){
-                $.ajax({
-                    url: "/capture_image",
-                    method: "POST",
-                    success: function(response) {
-                        alert(response.message);
-                    },
-                    error: function() {
-                        alert("An error occurred while capturing the image.");
-                    }
-                });
-            });
-        });
-    </script>
+
+    <!-- Bootstrap JS and dependencies CDN -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Number Plate Detection</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Number Plate Detection</h1>
+    <div class="video-container">
+        <img src="{{ url_for('video_feed') }}" id="video" />
+    </div>
+    <button id="capture-btn">Capture Image</button>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <script>
+        $(document).ready(function() {
+            $("#capture-btn").click(function() {
+                var video = document.getElementById("video");
+                var canvas = document.getElementById("canvas");
+                var context = canvas.getContext('2d');
+
+                if (video.videoWidth === 0 || video.videoHeight === 0) {
+                    alert("Video feed is not available.");
+                    return;
+                }
+
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                canvas.toBlob(function(blob) {
+                    if (!blob) {
+                        alert("Failed to capture image.");
+                        return;
+                    }
+
+                    var formData = new FormData();
+                    formData.append('image', blob, 'captured_image.jpg');
+
+                    $.ajax({
+                        url: "/api/capture",
+                        method: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            alert("Image captured and uploaded successfully!");
+                            console.log(response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error:", xhr.responseText);
+                            alert("An error occurred while capturing the image.");
+                        }
+                    });
+                }, 'image/jpeg');
+            });
+        });
+    </script>
+</body>
+</html>
