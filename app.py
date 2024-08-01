@@ -5,6 +5,7 @@ import threading
 import time
 import numpy as np
 from PIL import Image
+import requests
 
 app = Flask(__name__)
 
@@ -108,10 +109,26 @@ def api_capture():
     full_image_url = url_for('static', filename='plates/full_image.jpg', _external=True)
     plate_image_url = url_for('static', filename='plates/plate_image.jpg', _external=True) if plate_image_path else None
 
+    if full_image_url and plate_image_url:
+        send_image_to_django(full_image_path,plate_image_path)
+
     return jsonify({
         "full_image_url": full_image_url,
         "plate_image_url": plate_image_url
     })
+
+def send_image_to_django(full_image_path,plate_image_path):
+    django_api_url = "http://127.0.0.1:8000/number_plate_detection/api/number_plate_detection/"
+    with open(full_image_path,'rb') as f1, open(plate_image_path, 'rb') as f2:
+        files = {
+            'car_image':f1,
+            'number_plate_image':f2
+        }
+        response = requests.post(django_api_url,files=files)
+        if response.status_code == 201:
+            print("Image successfully sent to Django Api")
+        else:
+            print("Failed to send images to Djanog API:",response.status_code,response.text)
 
 if __name__ == "__main__":
     # Start the thread to capture frames
